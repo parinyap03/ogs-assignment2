@@ -1,5 +1,5 @@
 import Data from "@data/word.json";
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface word {
     lang: string;
@@ -10,29 +10,44 @@ const Checklist = () => {
   const [thaiWords, setThaiWords] = useState<string[]>([]);
   const [engWords, setEngWords] = useState<string[]>([]);
   const [lockStates, setLockStates] = useState<{ [key: string]: boolean }>({});
-
-  const clickedButtonsRef = useRef<string[]>([]);
-  
+  const timersRef = useRef<NodeJS.Timeout[]>([]); // เพิ่ม ref สำหรับเก็บอ้างอิงไปยัง setTimeout
+  const [isMoving, setIsMoving] = useState(false);
   useEffect(() => {
     const words = Data.map((item) => item.word);
     setAllWords(words);
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      moveAllButtonsBack();
-    }, 3000);
+    handleTimeout(thaiWords, "TH");
+  }, [thaiWords]);
 
-    return () => clearTimeout(timer);
-  }, [clickedButtonsRef.current]);
-  
+  useEffect(() => {
+    handleTimeout(engWords, "EN");
+  }, [engWords]);
 
-  const moveAllButtonsBack = () => {
-    clickedButtonsRef.current.forEach((button) => {
-      handleMoveBack(button);
-    });
-    clickedButtonsRef.current = [];
+  const handleTimeout = async (words: string[], lang: string) => {
+    // const index = words.findIndex((word) => Data.find((data) => data.word === word));
+    if (isMoving) {
+      const promises = words.map((word) => new Promise<void>((resolve) => {
+        const timer = setTimeout(() => {
+          // setIsMoving(true);
+          if (lang === "TH") {
+            setThaiWords((prevWords) => prevWords.filter((w) => w !== word));
+          } else if (lang === "EN") { 
+            setEngWords((prevWords) => prevWords.filter((w) => w !== word));
+          }
+          // allWords.push(word);
+          setAllWords((prevWords) => [...prevWords, word]);
+          // setAllWords(allWords);
+          resolve();  
+        }, 5000);
+        timersRef.current.push(timer);
+      }));
+      await Promise.all(promises);
+      setIsMoving(false);
+    }
   };
+  
 
   const handleMoveBack = (item: string) => {
     const word = Data.find((data) => data.word === item);
@@ -50,7 +65,6 @@ const Checklist = () => {
   };
 
   const handleButtonClick = (item: string) => {
-    clickedButtonsRef.current.push(item);
     const word = Data.find((data) => data.word === item);
     if (word) {
       if (word.lang === "TH") {
@@ -62,10 +76,24 @@ const Checklist = () => {
       }
       const updatedAllWords = allWords.filter((word) => word !== item);
       setAllWords(updatedAllWords);
+      setIsMoving(true);
+      handleTimeout([item], word.lang);
     }
   };
-
-
+  // const handleButtonClick = (item: string) => {
+  //   const word = Data.find((data) => data.word === item);
+  //   if (word) {
+  //     if (word.lang === "TH") {
+  //       const updatedThaiWords = [...thaiWords, item];
+  //       setThaiWords(updatedThaiWords);
+  //     } else if (word.lang === "EN") {
+  //       const updatedEngWords = [...engWords, item];
+  //       setEngWords(updatedEngWords);
+  //     }
+  //     const updatedAllWords = allWords.filter((word) => word !== item);
+  //     setAllWords(updatedAllWords);
+  //   }
+  // };
 
   const toggleLock = (item: string) => {
     setLockStates((prevLockStates) => ({
@@ -75,22 +103,23 @@ const Checklist = () => {
   };
 
   return (
-    <div className="mt-9 flex justify-center ">
-      <div className="w-auto">
-        <p className="text-center border-solid border-2 border-sky-500 rounded-lg p-2">
+    <div className="mt-7 flex justify-center ">
+      <div  className="w-auto">
+        <p id="headvocab" className="text-center border-solid border-2 rounded-lg p-2">
           คำศัพท์
         </p>
         <div
           id="boxall"
-          className="flex flex-col bg-white shadow-md border-solid border-2 border-sky-500 p-5 mt-5 rounded-lg w-80 h-90  items-center"
+          className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90  items-center"
         >
           {allWords.map((item, index) => (
             <button
+            id="allvocab"
               onClick={() => {
                 handleButtonClick(item);
               }}
               key={index}
-              className=" border-solid border-2 border-sky-500 rounded-lg p-1 mt-3 w-48 m-2"
+              className=" border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2"
             >
               <p className="m-auto">{item}</p>
             </button>
@@ -98,17 +127,17 @@ const Checklist = () => {
         </div>
       </div>
       <div className="ml-20 w-auto">
-        <p className="text-center border-solid border-2 border-sky-500 rounded-lg p-2">
+        <p id="headth" className="text-center border-solid border-2  rounded-lg p-2">
           ภาษาไทย
         </p>
         <div
           id="boxth"
-          className="flex flex-col bg-white shadow-md border-solid border-2 border-sky-500 p-5 mt-5 rounded-lg w-80 h-90 items-center"
+          className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
         >
           {thaiWords.map((item, index) => (
-            <div
+            <div id="thvocab"
               key={index}
-              className={`flex border-solid border-2 border-sky-500 rounded-lg p-1 mt-3 w-48 m-2`}
+              className={`flex border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2`}
             >
               <button
                 onClick={() => {
@@ -121,9 +150,9 @@ const Checklist = () => {
                   lockStates[item] ? "cursor-not-allowed" : ""
                 } w-full`}
               >
-                <p className="m-auto w-10">{item}</p>
+                <p className="m-auto w-20">{item}</p>
               </button>
-              <button onClick={() => toggleLock(item)} className="w-6">
+              <button onClick={() => toggleLock(item)} className="w-8">
                 {lockStates[item] ? <ImageLock /> : <ImageUnlock />}
               </button>
             </div>
@@ -131,17 +160,18 @@ const Checklist = () => {
         </div>
       </div>
       <div className="ml-20 w-auto">
-        <p className="text-center border-solid border-2 border-sky-500 rounded-lg p-2">
+        <p id="headen" className="text-center border-solid border-2  rounded-lg p-2">
           ภาษาอังกฤษ
         </p>
         <div
           id="boxen"
-          className="flex flex-col bg-white shadow-md border-solid border-2 border-sky-500 p-5 mt-5 rounded-lg w-80 h-90 items-center"
+          className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
         >
           {engWords.map((item, index) => (
             <div
+            id="engvocab"
               key={index}
-              className={`flex border-solid border-2 border-sky-500 rounded-lg p-1 mt-3 w-48 m-2`}
+              className={`flex border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2`}
             >
               <button
                 onClick={() => {
@@ -154,7 +184,7 @@ const Checklist = () => {
                   lockStates[item] ? "cursor-not-allowed" : ""
                 } w-full`}
               >
-                <p className="m-auto w-10">{item}</p>
+                <p className="m-auto w-20">{item}</p>
               </button>
               <button onClick={() => toggleLock(item)} className="w-6">
                 {lockStates[item] ? <ImageLock /> : <ImageUnlock />}
@@ -175,7 +205,7 @@ function ImageLock() {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="w-6 h-6 ml-auto mr-2"
+      className="w-6 h-6"
     >
       <path
         strokeLinecap="round"

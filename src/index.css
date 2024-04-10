@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root, [data-theme]{
-    background-color: oklch(0.85 0 0);
+    background-image: url('@assets/green-hill.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     color: var(--fallback-bc,oklch(var(--bc)/1));
 }

@@ -56,9 +56,11 @@ p {
     background-color: #ffd43b;
 }
 #allvocab,#thvocab,#engvocab,#boxall,#boxth,#boxen ,#headvocab,#headth,#headen {
-    box-shadow: 0 9px #999;
+    box-shadow: 0 9px #000000;
 }
-
+#allvocab,#thvocab,#engvocab{
+  box-shadow: 0 9px #8a8686;
+}
 @font-face {
    font-family: myFirstFont;
    src: url(sansation_light.woff);

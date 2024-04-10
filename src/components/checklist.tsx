@@ -1,5 +1,5 @@
 import Data from "@data/word.json";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface word {
     lang: string;
@@ -10,26 +10,56 @@ const Checklist = () => {
   const [thaiWords, setThaiWords] = useState<string[]>([]);
   const [engWords, setEngWords] = useState<string[]>([]);
   const [lockStates, setLockStates] = useState<{ [key: string]: boolean }>({});
-
+  const timersRef = useRef<NodeJS.Timeout[]>([]); // เพิ่ม ref สำหรับเก็บอ้างอิงไปยัง setTimeout
+  const [isMoving, setIsMoving] = useState(false);
   useEffect(() => {
     const words = Data.map((item) => item.word);
     setAllWords(words);
   }, []);
 
-const handleMoveBack = (item: string) => {
+  useEffect(() => {
+    handleTimeout(thaiWords, "TH");
+  }, [thaiWords]);
+
+  useEffect(() => {
+    handleTimeout(engWords, "EN");
+  }, [engWords]);
+
+  const handleTimeout = (words: string[], lang: string) => {
+    if (isMoving) {
+      words.forEach((word) => {
+        const timer = setTimeout(() => {
+          setIsMoving(true);
+          const updatedWords = words.filter((w) => w !== word);
+          if (lang === "TH") {
+            setThaiWords(updatedWords);
+          } else if (lang === "EN") {
+            setEngWords(updatedWords);
+          }
+          const updatedAllWords = [...allWords, word];
+          setAllWords(updatedAllWords);
+          // setAllWords((prevWords) => [...prevWords, word]);
+        }, 2000);
+        timersRef.current.push(timer);
+      });
+    }
+  };
+
+  const handleMoveBack = (item: string) => {
     const word = Data.find((data) => data.word === item);
     if (word) {
-        if (word.lang === "TH") {
-          const updatedThaiWords = thaiWords.filter((word) => word !== item);
-          setThaiWords(updatedThaiWords);
-        } else if (word.lang === "EN") {
-          const updatedEngWords = engWords.filter((word) => word !== item);
-          setEngWords(updatedEngWords);
-        }
-        const updatedAllWords = [...allWords, item];
-        setAllWords(updatedAllWords);
+      if (word.lang === "TH") {
+        const updatedThaiWords = thaiWords.filter((word) => word !== item);
+        setThaiWords(updatedThaiWords);
+      } else if (word.lang === "EN") {
+        const updatedEngWords = engWords.filter((word) => word !== item);
+        setEngWords(updatedEngWords);
       }
-};
+      const updatedAllWords = [...allWords, item];
+      setAllWords(updatedAllWords);
+    }
+  };
+
   const handleButtonClick = (item: string) => {
     const word = Data.find((data) => data.word === item);
     if (word) {
@@ -42,8 +72,24 @@ const handleMoveBack = (item: string) => {
       }
       const updatedAllWords = allWords.filter((word) => word !== item);
       setAllWords(updatedAllWords);
+      setIsMoving(true);
+      handleTimeout([item], word.lang);
     }
   };
+  // const handleButtonClick = (item: string) => {
+  //   const word = Data.find((data) => data.word === item);
+  //   if (word) {
+  //     if (word.lang === "TH") {
+  //       const updatedThaiWords = [...thaiWords, item];
+  //       setThaiWords(updatedThaiWords);
+  //     } else if (word.lang === "EN") {
+  //       const updatedEngWords = [...engWords, item];
+  //       setEngWords(updatedEngWords);
+  //     }
+  //     const updatedAllWords = allWords.filter((word) => word !== item);
+  //     setAllWords(updatedAllWords);
+  //   }
+  // };
 
   const toggleLock = (item: string) => {
     setLockStates((prevLockStates) => ({
