@@ -10,7 +10,7 @@ const Checklist = () => {
   const [thaiWords, setThaiWords] = useState<string[]>([]);
   const [engWords, setEngWords] = useState<string[]>([]);
   const [lockStates, setLockStates] = useState<{ [key: string]: boolean }>({});
-  const timersRef = useRef<NodeJS.Timeout[]>([]); // เพิ่ม ref สำหรับเก็บอ้างอิงไปยัง setTimeout
+  const timersRef = useRef<NodeJS.Timeout[]>([]); 
   const [isMoving, setIsMoving] = useState(false);
   useEffect(() => {
     const words = Data.map((item) => item.word);
@@ -19,11 +19,13 @@ const Checklist = () => {
 
   useEffect(() => {
     handleTimeout(thaiWords, "TH");
-  }, [thaiWords]);
-
-  useEffect(() => {
     handleTimeout(engWords, "EN");
-  }, [engWords]);
+  
+    return () => {
+      timersRef.current.forEach(timer => clearTimeout(timer));
+    };
+  }, [thaiWords, engWords]);
+  
 
   const handleTimeout = async (words: string[], lang: string) => {
     // const index = words.findIndex((word) => Data.find((data) => data.word === word));
@@ -45,8 +47,11 @@ const Checklist = () => {
       }));
       await Promise.all(promises);
       setIsMoving(false);
+    
     }
   };
+
+  
   
 
   const handleMoveBack = (item: string) => {
@@ -78,6 +83,7 @@ const Checklist = () => {
       setAllWords(updatedAllWords);
       setIsMoving(true);
       handleTimeout([item], word.lang);
+
     }
   };
   // const handleButtonClick = (item: string) => {
