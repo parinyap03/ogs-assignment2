@@ -10,7 +10,8 @@ export default defineConfig({
       "@components": path.resolve(__dirname, "src/components"),
       "@assets": path.resolve(__dirname, "src/assets"),
       "@data": path.resolve(__dirname, "src/data"),
-      
+      "@routercourse": path.resolve(__dirname, "src/routercourse"),
+      "@function": path.resolve(__dirname, "src/function"),
     },
     extensions: ['.ts', '.tsx']
   },
@@ -19,7 +20,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

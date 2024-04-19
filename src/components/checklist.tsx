@@ -1,234 +1,85 @@
-import Data from "@data/word.json";
-import { useEffect, useRef, useState } from "react";
+// import Data from "@data/word.json";
+// import { useState } from "react";
+// import Item from "@components/time";
 
-interface word {
-    lang: string;
-    word: string;
-} 
-const Checklist = () => {
-  const [allWords, setAllWords] = useState<string[]>([]);
-  const [thaiWords, setThaiWords] = useState<string[]>([]);
-  const [engWords, setEngWords] = useState<string[]>([]);
-  const [lockStates, setLockStates] = useState<{ [key: string]: boolean }>({});
-  const timersRef = useRef<NodeJS.Timeout[]>([]); // เพิ่ม ref สำหรับเก็บอ้างอิงไปยัง setTimeout
-  const [isMoving, setIsMoving] = useState(false);
-  useEffect(() => {
-    const words = Data.map((item) => item.word);
-    setAllWords(words);
-  }, []);
+// type Word = {
+//   lang: string;
+//   word: string;
+// };
 
-  useEffect(() => {
-    handleTimeout(thaiWords, "TH");
-  }, [thaiWords]);
+// const Checklist = () => {
+//   const [allWords, setAllWords] = useState<Word[]>(Data);
+//   const [thaiWords, setThaiWords] = useState<Word[]>([]);
+//   const [engWords, setEngWords] = useState<Word[]>([]);
+//   const handleButtonClick = (item:Word) => {
+//       if (item.lang === "TH") {
+//         setThaiWords((prev) => [...prev, item]);
+//         setAllWords(allWords.filter((word) => word !== item));
+//       } else if (item.lang === "EN") {
+//         setEngWords([...engWords, item]);
+//         setAllWords(allWords.filter((word) => word !== item));
+//       }
+//   };
+//   const handleMoveBack = (item: Word) => {
+//       if (item.lang === "TH") {
+//         setThaiWords((prev) => prev.filter((word) => word !== item));
+//       } else if (item.lang === "EN") {
+//         setEngWords((prev) => prev.filter((word) => word !== item));
+//       }
+//       setAllWords((prev) => [...prev, item]);
+//   };
+//   return (
+//     <div className="mt-7 flex justify-center ">
+//       <div className="w-auto">
+//         <p
+//           id="headvocab"
+//           className="text-center border-solid border-2 rounded-lg p-2"
+//         >
+//           คำศัพท์
+//         </p>
+//         <div
+//           id="boxall"
+//           className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90  items-center"
+//         >
+//           {allWords.map((item, index) => (
+//             <Item  key={item.word} text={item.word} onClick={()=>handleButtonClick(item) }/>
+//           ))}
+//         </div>
+//       </div>
+//       <div className="ml-20 w-auto">
+//         <p
+//           id="headth"
+//           className="text-center border-solid border-2  rounded-lg p-2"
+//         >
+//           ภาษาไทย
+//         </p>
+//         <div
+//           id="boxth"
+//           className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
+//         >
+//           {thaiWords.map((item, index) => (
+//             <Item key={item.word} text={item.word} onClick={()=>handleMoveBack(item) } isLock />
+//           ))}
+//         </div>
+//       </div>
+//       <div className="ml-20 w-auto">
+//         <p
+//           id="headen"
+//           className="text-center border-solid border-2  rounded-lg p-2"
+//         >
+//           ภาษาอังกฤษ
+//         </p>
+//         <div
+//           id="boxen"
+//           className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
+//         >
+//           {engWords.map((item, index) => (
+//             <Item key={item.word}  text={item.word} onClick={()=>handleMoveBack(item)} isLock/>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
-  useEffect(() => {
-    handleTimeout(engWords, "EN");
-  }, [engWords]);
-
-  const handleTimeout = (words: string[], lang: string) => {
-    if (isMoving) {
-      words.forEach((word) => {
-        const timer = setTimeout(() => {
-          setIsMoving(true);
-          const updatedWords = words.filter((w) => w !== word);
-          if (lang === "TH") {
-            setThaiWords(updatedWords);
-          } else if (lang === "EN") {
-            setEngWords(updatedWords);
-          }
-          const updatedAllWords = [...allWords, word];
-          setAllWords(updatedAllWords);
-          // setAllWords((prevWords) => [...prevWords, word]);
-        }, 2000);
-        timersRef.current.push(timer);
-      });
-    }
-  };
-
-  const handleMoveBack = (item: string) => {
-    const word = Data.find((data) => data.word === item);
-    if (word) {
-      if (word.lang === "TH") {
-        const updatedThaiWords = thaiWords.filter((word) => word !== item);
-        setThaiWords(updatedThaiWords);
-      } else if (word.lang === "EN") {
-        const updatedEngWords = engWords.filter((word) => word !== item);
-        setEngWords(updatedEngWords);
-      }
-      const updatedAllWords = [...allWords, item];
-      setAllWords(updatedAllWords);
-    }
-  };
-
-  const handleButtonClick = (item: string) => {
-    const word = Data.find((data) => data.word === item);
-    if (word) {
-      if (word.lang === "TH") {
-        const updatedThaiWords = [...thaiWords, item];
-        setThaiWords(updatedThaiWords);
-      } else if (word.lang === "EN") {
-        const updatedEngWords = [...engWords, item];
-        setEngWords(updatedEngWords);
-      }
-      const updatedAllWords = allWords.filter((word) => word !== item);
-      setAllWords(updatedAllWords);
-      setIsMoving(true);
-      handleTimeout([item], word.lang);
-    }
-  };
-  // const handleButtonClick = (item: string) => {
-  //   const word = Data.find((data) => data.word === item);
-  //   if (word) {
-  //     if (word.lang === "TH") {
-  //       const updatedThaiWords = [...thaiWords, item];
-  //       setThaiWords(updatedThaiWords);
-  //     } else if (word.lang === "EN") {
-  //       const updatedEngWords = [...engWords, item];
-  //       setEngWords(updatedEngWords);
-  //     }
-  //     const updatedAllWords = allWords.filter((word) => word !== item);
-  //     setAllWords(updatedAllWords);
-  //   }
-  // };
-
-  const toggleLock = (item: string) => {
-    setLockStates((prevLockStates) => ({
-      ...prevLockStates,
-      [item]: !prevLockStates[item],
-    }));
-  };
-
-  return (
-    <div className="mt-7 flex justify-center ">
-      <div  className="w-auto">
-        <p id="headvocab" className="text-center border-solid border-2 rounded-lg p-2">
-          คำศัพท์
-        </p>
-        <div
-          id="boxall"
-          className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90  items-center"
-        >
-          {allWords.map((item, index) => (
-            <button
-            id="allvocab"
-              onClick={() => {
-                handleButtonClick(item);
-              }}
-              key={index}
-              className=" border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2"
-            >
-              <p className="m-auto">{item}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="ml-20 w-auto">
-        <p id="headth" className="text-center border-solid border-2  rounded-lg p-2">
-          ภาษาไทย
-        </p>
-        <div
-          id="boxth"
-          className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
-        >
-          {thaiWords.map((item, index) => (
-            <div id="thvocab"
-              key={index}
-              className={`flex border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2`}
-            >
-              <button
-                onClick={() => {
-                  if (!lockStates[item]) {
-                    handleMoveBack(item);
-                  }
-                }}
-                disabled={lockStates[item]}
-                className={`${
-                  lockStates[item] ? "cursor-not-allowed" : ""
-                } w-full`}
-              >
-                <p className="m-auto w-20">{item}</p>
-              </button>
-              <button onClick={() => toggleLock(item)} className="w-8">
-                {lockStates[item] ? <ImageLock /> : <ImageUnlock />}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="ml-20 w-auto">
-        <p id="headen" className="text-center border-solid border-2  rounded-lg p-2">
-          ภาษาอังกฤษ
-        </p>
-        <div
-          id="boxen"
-          className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
-        >
-          {engWords.map((item, index) => (
-            <div
-            id="engvocab"
-              key={index}
-              className={`flex border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2`}
-            >
-              <button
-                onClick={() => {
-                  if (!lockStates[item]) {
-                    handleMoveBack(item);
-                  }
-                }}
-                disabled={lockStates[item]}
-                className={`${
-                  lockStates[item] ? "cursor-not-allowed" : ""
-                } w-full`}
-              >
-                <p className="m-auto w-20">{item}</p>
-              </button>
-              <button onClick={() => toggleLock(item)} className="w-6">
-                {lockStates[item] ? <ImageLock /> : <ImageUnlock />}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-function ImageLock() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-6 h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-      />
-    </svg>
-  );
-}
-
-function ImageUnlock() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-6 h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-      />
-    </svg>
-  );
-}
-
-export default Checklist;
+// export default Checklist;

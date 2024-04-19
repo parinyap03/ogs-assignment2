@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-// import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import { motion } from "framer-motion";
+
 type Word = {
   text: string;
   onClick: () => void;
@@ -12,7 +13,7 @@ const Time = ({ text, onClick, isLock = false }: Word) => {
   useEffect(() => {
     if (isLock) {
       timer.current = setTimeout(() => {
-        // console.log("timeout", text);
+        console.log("timeout", text);
         onClick();
       }, 5000);
     }
@@ -33,44 +34,36 @@ const Time = ({ text, onClick, isLock = false }: Word) => {
   };
 
   return (
-    <div
-      id={isLock ? "engvocab" : ""}
-      className={
-        isLock ? `flex border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2` : ""
-      }
-    >
-      <button
-        id={!isLock ? "allvocab" : ""}
+  
+      <div
+        id={isLock ? "engvocab" : ""}
         className={
-          !isLock
-            ? " border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2"
-            : "w-full"
+          isLock? `flex border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2`
+            : ""
         }
-        style={lockStates ? { cursor: "not-allowed" } : {}}
-        onClick={() => {
-          if (!lockStates) {
-            onClick();
-          }
-        }}
       >
-        <p className="m-auto w-20">{text}</p>
-      </button>
-
-      {isLock && (
-        <button className="w-6" onClick={handleLock}>
-          {/* <CountdownCircleTimer
-            isPlaying
-            duration={10}
-            colors="#A30000"
-            onComplete={() => {
-              // do your stuff here
-              return { shouldRepeat: true, delay: 1.5 }; // repeat animation in 1.5 seconds
-            }}
-          /> */}
-          {lockStates ? <ImageLock /> : <ImageUnlock />}
+        <button
+          id={!isLock ? "allvocab" : ""}
+          className={
+            !isLock
+              ? " border-solid border-2  rounded-lg p-1 mt-3 w-48 m-2"
+              : "w-full"
+          }
+          style={lockStates ? { cursor: "not-allowed" } : {}}
+          onClick={() => {
+            if (!lockStates) {
+              onClick();
+            }
+          }}
+        >
+          <p className="m-auto w-20">{text}</p>
         </button>
-      )}
-    </div>
+        {isLock && (
+          <button className="w-6" onClick={handleLock}>
+            {lockStates ? <ImageLock /> : <ImageUnlock />}
+          </button>
+        )}
+      </div>
   );
 };
 

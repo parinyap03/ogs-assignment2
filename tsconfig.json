@@ -26,6 +26,8 @@
       "@components/*": ["components/*" ],
       "@assets/*": ["assets/*"],
       "@data/*": ["data/*"],
+      "@routercourse/*": ["routercourse/*"],
+      "@function/*": ["function/*"],
     }
   },
   "include": ["src"],
