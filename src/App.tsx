@@ -11,11 +11,17 @@ import Contact from "@routercourse/Contact";
 import NoPage from "@routercourse/NoPage";
 import LayoutHome from "@routercourse/LayoutHome";
 import Routers from "@function/Routers";
+import useSelection from "antd/es/table/hooks/useSelection";
+import { useSelector } from "react-redux";
+import Counter from "@components/Counter";
 
 function App() {
+  // const register =useSelector((state) => state.register.value);
+
   return (
     <>
       <RouterProvider router={Routers} />
+  
     </>
   );
   // return (
@@ -69,7 +75,6 @@ function App() {
   //   }
   // ]);
   // return router;
-  
 }
 
 export default App;

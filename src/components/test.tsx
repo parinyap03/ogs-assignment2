@@ -9,7 +9,7 @@ type Word = {
 
 const Checklist = () => {
   const [allWords, setAllWords] = useState<Word[]>(Data);
-  const [thaiWords, setThaiWords] = useState<Word[]>([]);
+  const [thaiWord, setThaiWords] = useState<Word[]>([]);
   const [engWords, setEngWords] = useState<Word[]>([]);
   
   const handleButtonClick = (item: Word) => {
@@ -84,7 +84,7 @@ const Checklist = () => {
             id="boxth"
             className="flex flex-col bg-white shadow-md border-solid border-2  p-5 mt-5 rounded-lg w-80 h-90 items-center"
           >
-            {thaiWords.map((item, index) => (
+            {thaiWord.map((item, index) => (
               <Item
                 key={item.word}
                 text={item.word}

@@ -10,7 +10,6 @@
     color: var(--fallback-bc,oklch(var(--bc)/1));
 } */
 
-*{
-    padding: 1rem;  
+/* *{
     text-align: center;
-}
+} */
